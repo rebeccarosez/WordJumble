@@ -1,0 +1,81 @@
+#!/usr/bin/env python
+
+class WordJumble:
+
+    dictionary = []
+    
+    #assumes that word list is sorted ASCII-betically (A, B, C, a, b, c)
+    def __init__(self):
+        f = open("word_list.40", "r")
+        self.dictionary = f.readlines()
+        f.close()
+    
+    #compares str1 and str2. If str1 comes before str2, returns -1, if str1 comes after str2, returns 1.
+    # If they are equal returns 0
+    def stringCompare(self, str1, str2):
+        lenStr2 = len(str2)
+        for i in range(0, len(str1)):
+            if i == lenStr2 or str1[i] > str2[i]:
+                return 1
+            elif str1[i] < str2[i]:
+                return -1
+        if lenStr2 > len(str1):
+            return -1
+        return 0
+
+    
+    
+    # This method will use a binary search to search word_list.40 to find word.
+    def isValidWord(self, word):
+        max = len(self.dictionary)
+        min = 0
+        index = (max + min)/2
+        while(max >= min):
+            dictWord = self.dictionary[index].rstrip()
+            compareValue = self.stringCompare(dictWord, word)
+            if compareValue < 0:
+                min = index+1
+                index = (max + min)/2
+            elif compareValue > 0:
+                max = index-1
+                index = (max + min)/2
+            else:
+                return True
+        return False
+
+
+    #function that will generate an array (listOfPerms) of all
+    # of the permutations of given string (str) recursively
+    def findPermutations(self, str, strConstants, listOfPerms):
+        length = len(str)
+        if length == 0:
+            listOfPerms.append(strConstants);
+
+        for i in range(0, length):
+            perm = strConstants + str[i]
+            newstr = str[0:i] + str[i+1:length]
+            self.findPermutations(newstr, perm, listOfPerms)
+        return listOfPerms
+
+    def jumble(self, str):
+        permutations = self.findPermutations(str, "", [])
+        listOfWords = []
+        for perm in permutations:
+            for i in range(0, len(perm)):
+                for j in range(i+1, len(perm)+1):
+                    word = perm[i:j]
+                    if self.isValidWord(word) and word not in listOfWords:
+                        listOfWords.append(word)
+                        print word
+
+
+wj = WordJumble()
+
+str = raw_input('Enter word for word jumble, or q to quit: ')
+while str != 'q':
+    wj.jumble(str)
+    str = raw_input('Enter word for word jumble, or q to quit: ')
+
+
+
+
